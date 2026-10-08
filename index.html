@@ -1,0 +1,1755 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Follow-Up Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+
+    --bg: #EEF1F4;
+    --surface: #FFFFFF;
+    --surface-2: #F5F7F9;
+    --ink: #12181F;
+    --ink-muted: #5B6672;
+    --ink-faint: #8B94A0;
+    --accent: #D93A2B;
+    --accent-ink: #FFFFFF;
+    --warn: #B9791A;
+    --warn-bg: #FCEFD9;
+    --overdue: #D93A2B;
+    --overdue-bg: #FBE4E1;
+    --upcoming-bg: #EEF1F4;
+    --border: #D7DCE1;
+    --border-strong: #B9C1C9;
+    --success: #1E7A46;
+    --success-bg: #DFF0E6;
+    --lost: #8B939C;
+    --lost-bg: #E9EBEE;
+    --shadow: 0 1px 2px rgba(18,24,31,0.06);
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #13171B;
+      --surface: #1B2025;
+      --surface-2: #20262B;
+      --ink: #EEF1F3;
+      --ink-muted: #9BA5AF;
+      --ink-faint: #6E7882;
+      --accent: #FF5A45;
+      --accent-ink: #14181C;
+      --warn: #E7A63D;
+      --warn-bg: #3A2E14;
+      --overdue: #FF5A45;
+      --overdue-bg: #3A1A16;
+      --upcoming-bg: #1F252A;
+      --border: #2B3238;
+      --border-strong: #3A424A;
+      --success: #3FCB7C;
+      --success-bg: #123321;
+      --lost: #6E7882;
+      --lost-bg: #23282D;
+      --shadow: 0 1px 2px rgba(0,0,0,0.4);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #13171B;
+    --surface: #1B2025;
+    --surface-2: #20262B;
+    --ink: #EEF1F3;
+    --ink-muted: #9BA5AF;
+    --ink-faint: #6E7882;
+    --accent: #FF5A45;
+    --accent-ink: #14181C;
+    --warn: #E7A63D;
+    --warn-bg: #3A2E14;
+    --overdue: #FF5A45;
+    --overdue-bg: #3A1A16;
+    --upcoming-bg: #1F252A;
+    --border: #2B3238;
+    --border-strong: #3A424A;
+    --success: #3FCB7C;
+    --success-bg: #123321;
+    --lost: #6E7882;
+    --lost-bg: #23282D;
+    --shadow: 0 1px 2px rgba(0,0,0,0.4);
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+  h1, h2, h3, .display {
+    font-family: 'Oswald', 'Arial Narrow', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    margin: 0;
+  }
+  p { margin: 0; }
+  button { font-family: inherit; }
+  input, select, textarea { font-family: inherit; }
+
+  .wrap {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  /* ---- Header ---- */
+  header.top {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--bg);
+    padding-top: calc(14px + env(safe-area-inset-top, 0px));
+    padding-bottom: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .brand-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 0 16px;
+    gap: 10px;
+  }
+  .brand-row h1 {
+    font-size: 22px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .brand-row h1 .stripe {
+    color: var(--accent);
+  }
+  .gym-add-btn {
+    border: 1px solid var(--border-strong);
+    background: transparent;
+    color: var(--ink-muted);
+    font-size: 13px;
+    padding: 6px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .gym-add-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .gym-tabs {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    padding: 10px 16px 0 16px;
+    scrollbar-width: none;
+  }
+  .gym-tabs::-webkit-scrollbar { display: none; }
+  .gym-tab {
+    flex: 0 0 auto;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--ink-muted);
+    font-family: 'Oswald', sans-serif;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    padding: 8px 4px 10px 4px;
+    margin-right: 14px;
+    cursor: pointer;
+  }
+  .gym-tab.active {
+    color: var(--ink);
+    border-bottom-color: var(--accent);
+  }
+
+  .view-tabs {
+    display: flex;
+    gap: 0;
+    padding: 0 16px;
+    margin-top: 2px;
+  }
+  .view-tab {
+    background: transparent;
+    border: none;
+    color: var(--ink-faint);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 12px 8px 0;
+    cursor: pointer;
+  }
+  .view-tab.active { color: var(--ink); }
+  .view-tab .count {
+    display: inline-block;
+    margin-left: 4px;
+    color: var(--ink-faint);
+    font-weight: 400;
+  }
+
+  /* ---- Content ---- */
+  main { padding: 16px 0 100px 0; }
+  .section-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin: 20px 16px 8px 16px;
+  }
+  .section-label:first-child { margin-top: 4px; }
+
+  .search-row {
+    padding: 0 16px;
+    margin-bottom: 4px;
+  }
+  .search-row input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: 3px;
+    font-size: 14px;
+  }
+  .search-row input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+
+  .card-list { padding: 0 16px; display: flex; flex-direction: column; gap: 8px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--border-strong);
+    border-radius: 3px;
+    padding: 12px 14px;
+    box-shadow: var(--shadow);
+  }
+  .card.due-overdue { border-left-color: var(--overdue); background: var(--overdue-bg); }
+  .card.due-today { border-left-color: var(--warn); background: var(--warn-bg); }
+  .card.status-joined { border-left-color: var(--success); }
+  .card.status-lost { border-left-color: var(--lost); opacity: 0.75; }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .card-name { font-size: 16px; font-weight: 700; font-family: 'Oswald', sans-serif; }
+  .card-meta { font-size: 12.5px; color: var(--ink-muted); margin-top: 2px; }
+  .badge {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    padding: 3px 7px;
+    border-radius: 2px;
+    white-space: nowrap;
+    flex: 0 0 auto;
+  }
+  .badge.overdue { background: var(--overdue); color: #fff; }
+  .badge.today { background: var(--warn); color: #1c1508; }
+  .badge.upcoming { background: var(--border); color: var(--ink-muted); }
+  .badge.joined { background: var(--success); color: #fff; }
+  .badge.lost { background: var(--lost); color: #fff; }
+
+  .card-notes {
+    font-size: 13px;
+    color: var(--ink-muted);
+    margin-top: 8px;
+    line-height: 1.4;
+  }
+
+  .card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .btn {
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 11px;
+    border-radius: 3px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    text-decoration: none;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn-call { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+  .btn-whatsapp { background: #1FA855; color: #fff; border-color: #1FA855; }
+  .btn-pkg { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn-ghost { background: transparent; color: var(--ink-muted); border-color: transparent; padding: 7px 8px; }
+  .btn-ghost:hover { color: var(--ink); }
+  .btn-sm { font-size: 12px; padding: 5px 9px; }
+
+  .icon { width: 14px; height: 14px; flex: 0 0 auto; }
+
+  .empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--ink-faint);
+  }
+  .empty .display { font-size: 17px; color: var(--ink-muted); margin-bottom: 4px; }
+  .empty p { font-size: 13.5px; }
+  .empty button { margin-top: 14px; }
+
+  /* ---- FAB ---- */
+  .fab {
+    position: fixed;
+    right: 20px;
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    background: var(--accent);
+    color: var(--accent-ink);
+    border: none;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    font-size: 28px;
+    line-height: 1;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    cursor: pointer;
+    z-index: 30;
+  }
+
+  /* ---- Modal ---- */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10,12,14,0.55);
+    z-index: 100;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal-overlay.hidden { display: none; }
+  .modal {
+    background: var(--surface);
+    width: 100%;
+    max-width: 640px;
+    max-height: 88vh;
+    overflow-y: auto;
+    border-radius: 12px 12px 0 0;
+    padding: 20px 18px calc(20px + env(safe-area-inset-bottom, 0px)) 18px;
+  }
+  .modal h2 {
+    font-size: 18px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .field { margin-bottom: 12px; }
+  .field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-muted);
+    margin-bottom: 4px;
+  }
+  .field input, .field textarea, .field select {
+    width: 100%;
+    padding: 10px 11px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--ink);
+    border-radius: 4px;
+    font-size: 15px;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: -1px;
+  }
+  .field textarea { min-height: 64px; resize: vertical; }
+  .field-row { display: flex; gap: 10px; }
+  .field-row .field { flex: 1; }
+  .modal-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .modal-actions .btn { flex: 1; justify-content: center; padding: 11px; font-size: 14px; }
+  .btn-primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .modal-close {
+    position: absolute;
+    top: 14px; right: 14px;
+    background: none; border: none;
+    font-size: 20px;
+    color: var(--ink-faint);
+    cursor: pointer;
+  }
+  .modal-wrap { position: relative; }
+
+  .pkg-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 14px;
+    box-shadow: var(--shadow);
+  }
+  .pkg-top { display: flex; justify-content: space-between; align-items: baseline; }
+  .pkg-name { font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 700; }
+  .pkg-price { font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 700; color: var(--accent); }
+  .pkg-meta { font-size: 12.5px; color: var(--ink-muted); margin-top: 3px; }
+  .pkg-notes { font-size: 13px; color: var(--ink-muted); margin-top: 8px; }
+  .pkg-actions { display: flex; gap: 6px; margin-top: 10px; }
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%);
+    background: var(--ink);
+    color: var(--bg);
+    padding: 10px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    z-index: 200;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+
+  .status-toggle {
+    display: flex;
+    gap: 6px;
+    padding: 0 16px;
+    margin: 4px 0 10px 0;
+  }
+  .status-toggle button {
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--ink-faint);
+    cursor: pointer;
+  }
+  .status-toggle button.active {
+    background: var(--ink);
+    color: var(--surface);
+    border-color: var(--ink);
+  }
+
+  #loading-screen {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg); color: var(--ink-muted); font-size: 14px; z-index: 500;
+  }
+  #loading-screen.hidden { display: none; }
+</style>
+
+<!-- Firebase (free tier) — provides the shared database so every phone sees the same data -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script>
+  // ============================================================
+  // PASTE YOUR FIREBASE CONFIG HERE (from Firebase Console > Project settings)
+  // ============================================================
+  const firebaseConfig = {
+    apiKey: "PASTE_YOUR_API_KEY",
+    authDomain: "PASTE_YOUR_PROJECT.firebaseapp.com",
+    projectId: "PASTE_YOUR_PROJECT_ID",
+    storageBucket: "PASTE_YOUR_PROJECT.appspot.com",
+    messagingSenderId: "PASTE_YOUR_SENDER_ID",
+    appId: "PASTE_YOUR_APP_ID"
+  };
+</script>
+</head>
+<body>
+
+<div id="loading-screen">Loading follow-up desk…</div>
+
+<header class="top">
+  <div class="brand-row">
+    <h1>Follow-Up <span class="stripe">Desk</span></h1>
+    <div style="display:flex; gap:6px;">
+      <button class="gym-add-btn" data-action="manage-gyms">Manage gyms</button>
+      <button class="gym-add-btn" data-action="add-gym">+ Gym</button>
+    </div>
+  </div>
+  <div class="gym-tabs" id="gym-tabs"></div>
+  <div id="gym-info" style="padding:0 16px 8px 16px; font-size:12.5px; color:var(--ink-muted);"></div>
+  <div class="view-tabs">
+    <button class="view-tab active" data-view="prospects" id="tab-prospects">Prospects</button>
+    <button class="view-tab" data-view="packages" id="tab-packages">Packages</button>
+  </div>
+</header>
+
+<main class="wrap" id="main"></main>
+
+<button class="fab" id="fab">+</button>
+
+<div class="modal-overlay hidden" id="modal-overlay">
+  <div class="modal modal-wrap" id="modal-content"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  const SOURCES = ['Walk-in', 'Google', 'Instagram', 'Facebook', 'Poster', 'Referral', 'Other'];
+
+  // ---------- State ----------
+  let db = null;
+  let gyms = [];
+  let prospects = [];
+  let packages = [];
+  let currentGymId = null;
+  let currentView = 'prospects'; // 'prospects' | 'packages'
+  let statusFilter = 'active'; // active | joined | lost
+  let searchTerm = '';
+  let unsubProspects = null;
+  let unsubPackages = null;
+  let editingProspectId = null;
+  let editingPackageId = null;
+  let expandedProspectId = null;
+
+  // ---------- Utilities ----------
+  function todayStr() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function fmtDate(iso) {
+    if (!iso) return '—';
+    const [y, m, d] = iso.split('-').map(Number);
+    const dt = new Date(y, m - 1, d);
+    return dt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+  function daysDiff(iso) {
+    const [y, m, d] = iso.split('-').map(Number);
+    const target = new Date(y, m - 1, d);
+    const now = new Date();
+    const nowMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    return Math.round((target - nowMid) / 86400000);
+  }
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function normalizePhone(raw) {
+    let digits = String(raw || '').replace(/[^\d]/g, '');
+    if (digits.length === 10) digits = '91' + digits;
+    if (digits.length === 11 && digits.startsWith('0')) digits = '91' + digits.slice(1);
+    return digits;
+  }
+  function formatTime12(t) {
+    if (!t) return '';
+    const [h, m] = t.split(':').map(Number);
+    const period = h >= 12 ? 'PM' : 'AM';
+    let hh = h % 12; if (hh === 0) hh = 12;
+    return `${hh}:${String(m).padStart(2, '0')} ${period}`;
+  }
+  function gymTimingsLabel(gym) {
+    return batchLabel(gym) || (gym && gym.timings) || '';
+  }
+  function batchLabel(obj) {
+    if (!obj) return '';
+    const parts = [];
+    if (obj.morningStart && obj.morningEnd) parts.push(`Morning ${formatTime12(obj.morningStart)}–${formatTime12(obj.morningEnd)}`);
+    if (obj.eveningStart && obj.eveningEnd) parts.push(`Evening ${formatTime12(obj.eveningStart)}–${formatTime12(obj.eveningEnd)}`);
+    return parts.join(' · ');
+  }
+  function serviceNames(gym) {
+    return ((gym && gym.services) || []).map(s => typeof s === 'object' ? s.name : s).filter(Boolean);
+  }
+  function findGymService(gym, name) {
+    if (!gym || !name) return null;
+    return ((gym.services) || []).find(s => (typeof s === 'object' ? s.name : s) === name) || null;
+  }
+  function packageTimingsLabel(pkg, gym) {
+    if (pkg.timings) return pkg.timings;
+    if (pkg.service) {
+      const svc = findGymService(gym, pkg.service);
+      const label = svc && typeof svc === 'object' ? batchLabel(svc) : '';
+      if (label) return label;
+    }
+    return gymTimingsLabel(gym);
+  }
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 1800);
+  }
+  function currentGym() {
+    return gyms.find(g => g.id === currentGymId) || null;
+  }
+  function uid() {
+    return 'id' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  }
+
+  // ---------- DB bootstrap (Firebase) ----------
+  async function init() {
+    try {
+      if (firebaseConfig.apiKey === 'PASTE_YOUR_API_KEY') {
+        showFatal('Firebase isn\'t set up yet — open index.html and paste your Firebase config at the top of the file.');
+        return;
+      }
+      firebase.initializeApp(firebaseConfig);
+      await firebase.auth().signInAnonymously();
+      db = firebase.firestore();
+      subscribeGyms();
+    } catch (err) {
+      showFatal('Could not connect to the database: ' + (err && err.message ? err.message : 'check your Firebase setup.'));
+    }
+  }
+
+  function showFatal(msg) {
+    document.getElementById('loading-screen').textContent = msg;
+  }
+
+  function browserDownload(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  }
+
+  function subscribeGyms() {
+    db.collection('gyms').orderBy('createdAt', 'asc').onSnapshot(async (snap) => {
+      gyms = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (gyms.length === 0) {
+        // first run: seed the two known gyms
+        try {
+          await db.collection('gyms').add({ name: 'Elite Fitness Gym', createdAt: Date.now() });
+          await db.collection('gyms').add({ name: 'Elite Max Gym', createdAt: Date.now() + 1 });
+        } catch (e) { /* ignore, will retry via snapshot */ }
+        return;
+      }
+      if (!currentGymId || !gyms.find(g => g.id === currentGymId)) {
+        currentGymId = gyms[0].id;
+        switchGym(currentGymId);
+      }
+      document.getElementById('loading-screen').classList.add('hidden');
+      renderGymTabs();
+      render();
+    }, (err) => {
+      showFatal('Storage error: ' + err.code);
+    });
+  }
+
+  function switchGym(gymId) {
+    currentGymId = gymId;
+    if (unsubProspects) unsubProspects();
+    if (unsubPackages) unsubPackages();
+    prospects = [];
+    packages = [];
+    unsubProspects = db.collection('prospects')
+      .where('gymId', '==', gymId)
+      .onSnapshot((snap) => {
+        prospects = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        render();
+      }, (err) => toast('Load error: ' + err.code));
+    unsubPackages = db.collection('packages')
+      .where('gymId', '==', gymId)
+      .onSnapshot((snap) => {
+        packages = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        render();
+      }, (err) => toast('Load error: ' + err.code));
+    renderGymTabs();
+  }
+
+  // ---------- Rendering: gym tabs ----------
+  function renderGymTabs() {
+    const el = document.getElementById('gym-tabs');
+    el.innerHTML = gyms.map(g => `
+      <button class="gym-tab ${g.id === currentGymId ? 'active' : ''}" data-gym-id="${g.id}">${escapeHtml(g.name)}</button>
+    `).join('');
+    const gym = currentGym();
+    const info = document.getElementById('gym-info');
+    const label = gymTimingsLabel(gym);
+    if (info) {
+      if (label) { info.textContent = 'Timings: ' + label; info.style.display = 'block'; }
+      else info.style.display = 'none';
+    }
+  }
+
+  // ---------- Main render dispatch ----------
+  function render() {
+    document.getElementById('tab-prospects').classList.toggle('active', currentView === 'prospects');
+    document.getElementById('tab-packages').classList.toggle('active', currentView === 'packages');
+    document.getElementById('fab').style.display = 'flex';
+    document.getElementById('fab').style.alignItems = 'center';
+    document.getElementById('fab').style.justifyContent = 'center';
+    if (currentView === 'prospects') renderProspectsView();
+    else renderPackagesView();
+  }
+
+  // ---------- Prospects view ----------
+  function renderProspectsView() {
+    const main = document.getElementById('main');
+    const gym = currentGym();
+    if (!gym) { main.innerHTML = '<div class="empty"><div class="display">No gym selected</div></div>'; return; }
+
+    let list = prospects.filter(p => (p.status || 'active') === statusFilter);
+    if (searchTerm.trim()) {
+      const q = searchTerm.trim().toLowerCase();
+      list = list.filter(p => (p.name || '').toLowerCase().includes(q) || (p.phone || '').includes(q));
+    }
+
+    const counts = {
+      active: prospects.filter(p => (p.status || 'active') === 'active').length,
+      joined: prospects.filter(p => p.status === 'joined').length,
+      lost: prospects.filter(p => p.status === 'lost').length,
+    };
+
+    let html = `
+      <div class="search-row"><input type="text" id="search-input" placeholder="Search name or number…" value="${escapeHtml(searchTerm)}"></div>
+      <div class="status-toggle">
+        <button data-status="active" class="${statusFilter === 'active' ? 'active' : ''}">Active (${counts.active})</button>
+        <button data-status="joined" class="${statusFilter === 'joined' ? 'active' : ''}">Joined (${counts.joined})</button>
+        <button data-status="lost" class="${statusFilter === 'lost' ? 'active' : ''}">Lost (${counts.lost})</button>
+      </div>
+    `;
+
+    if (statusFilter === 'active') {
+      const overdue = list.filter(p => p.followupDate && daysDiff(p.followupDate) < 0).sort((a,b) => a.followupDate.localeCompare(b.followupDate));
+      const dueToday = list.filter(p => p.followupDate && daysDiff(p.followupDate) === 0);
+      const upcoming = list.filter(p => !p.followupDate || daysDiff(p.followupDate) > 0).sort((a,b) => (a.followupDate||'9999').localeCompare(b.followupDate||'9999'));
+
+      if (list.length === 0) {
+        html += emptyState('No active prospects yet', 'Add an enquiry to start tracking follow-ups.', 'Add prospect', 'add-prospect');
+      } else {
+        if (overdue.length) html += sectionLabel(`Overdue (${overdue.length})`) + cardListHtml(overdue, gym);
+        if (dueToday.length) html += sectionLabel(`Due today (${dueToday.length})`) + cardListHtml(dueToday, gym);
+        if (upcoming.length) html += sectionLabel(`Upcoming (${upcoming.length})`) + cardListHtml(upcoming, gym);
+      }
+    } else {
+      list = list.sort((a,b) => (b.updatedAt||b.createdAt||0) - (a.updatedAt||a.createdAt||0));
+      if (list.length === 0) {
+        html += emptyState(statusFilter === 'joined' ? 'No joined members yet' : 'No lost leads', '', '', '');
+      } else {
+        html += cardListHtml(list, gym);
+      }
+    }
+
+    main.innerHTML = html;
+    bindProspectEvents();
+  }
+
+  function sectionLabel(text) {
+    return `<div class="section-label">${escapeHtml(text)}</div>`;
+  }
+  function emptyState(title, sub, btnLabel, btnAction) {
+    return `<div class="empty">
+      <div class="display">${escapeHtml(title)}</div>
+      ${sub ? `<p>${escapeHtml(sub)}</p>` : ''}
+      ${btnLabel ? `<button class="btn btn-primary" data-action="${btnAction}">${escapeHtml(btnLabel)}</button>` : ''}
+    </div>`;
+  }
+
+  function cardListHtml(list, gym) {
+    return `<div class="card-list">` + list.map(p => prospectCardHtml(p, gym)).join('') + `</div>`;
+  }
+
+  function prospectCardHtml(p, gym) {
+    const status = p.status || 'active';
+    let dueClass = '';
+    let badge = '';
+    if (status === 'active' && p.followupDate) {
+      const dd = daysDiff(p.followupDate);
+      if (dd < 0) { dueClass = 'due-overdue'; badge = `<span class="badge overdue">${Math.abs(dd)}d overdue</span>`; }
+      else if (dd === 0) { dueClass = 'due-today'; badge = `<span class="badge today">Due today</span>`; }
+      else { badge = `<span class="badge upcoming">in ${dd}d</span>`; }
+    } else if (status === 'joined') {
+      dueClass = 'status-joined';
+      badge = `<span class="badge joined">Joined</span>`;
+    } else if (status === 'lost') {
+      dueClass = 'status-lost';
+      badge = `<span class="badge lost">Lost</span>`;
+    }
+
+    const isDue = status === 'active' && p.followupDate && daysDiff(p.followupDate) <= 0;
+    const isExpanded = expandedProspectId === p.id;
+
+    let actions = '';
+    if (isDue && status === 'active') {
+      actions = `
+        <div class="card-actions">
+          <a class="btn btn-call" href="tel:+${normalizePhone(p.phone)}"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.5.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.9 21 3 13.1 3 3c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.5.1.4 0 .8-.2 1L6.6 10.8z"/></svg>Call</a>
+          <a class="btn btn-whatsapp" href="https://wa.me/${normalizePhone(p.phone)}?text=${encodeURIComponent(followupMessage(p, gym))}" target="_blank" rel="noopener">
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.6 1.4 5.1L2 22l5.1-1.3c1.4.8 3.1 1.2 4.9 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3C4.2 15 3.8 13.5 3.8 12c0-4.5 3.7-8.2 8.2-8.2s8.2 3.7 8.2 8.2-3.7 8-8.2 8zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.7.8-.8 1-.2.2-.3.2-.5.1-.2-.1-1-.4-1.9-1.2-.7-.6-1.2-1.4-1.3-1.6-.1-.2 0-.4.1-.5.1-.1.2-.3.4-.4.1-.1.2-.2.2-.4.1-.2 0-.3 0-.4-.1-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.2.9 2.4c.1.2 1.6 2.5 3.9 3.4.5.2.9.4 1.3.5.5.2 1 .1 1.3.1.4-.1 1.3-.5 1.5-1 .2-.5.2-.9.1-1z"/></svg>WhatsApp
+          </a>
+          <button class="btn btn-pkg" data-action="send-package" data-id="${p.id}">Send package</button>
+          <button class="btn btn-sm" data-action="log-followup" data-id="${p.id}">${isExpanded ? 'Close' : 'Mark done'}</button>
+        </div>
+      `;
+    } else if (status === 'active') {
+      actions = `<div class="card-actions">
+        <a class="btn btn-sm" href="tel:+${normalizePhone(p.phone)}">Call</a>
+        <a class="btn btn-sm" href="https://wa.me/${normalizePhone(p.phone)}" target="_blank" rel="noopener">WhatsApp</a>
+      </div>`;
+    }
+
+    let expandedHtml = '';
+    if (isExpanded) {
+      expandedHtml = `
+        <div class="field" style="margin-top:10px;">
+          <label>Outcome note</label>
+          <textarea id="log-note-${p.id}" placeholder="What happened on the call?">${escapeHtml(p.notes || '')}</textarea>
+        </div>
+        <div class="field">
+          <label>Next follow-up date</label>
+          <input type="date" id="log-date-${p.id}" value="${p.followupDate || ''}">
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-primary" data-action="reschedule" data-id="${p.id}">Save &amp; reschedule</button>
+          <button class="btn" data-action="mark-joined" data-id="${p.id}">Mark joined</button>
+          <button class="btn" data-action="mark-lost" data-id="${p.id}">Mark lost</button>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="card ${dueClass}" data-card-id="${p.id}">
+        <div class="card-top">
+          <div>
+            <div class="card-name">${escapeHtml(p.name)}${p.age ? ` <span style="font-weight:400;color:var(--ink-muted);font-size:13px;">· ${escapeHtml(p.age)}y</span>` : ''}</div>
+            <div class="card-meta">${escapeHtml(p.phone || '')} · Enquired ${fmtDate(p.enquiryDate)}${p.source ? ' via ' + escapeHtml(p.source) : ''} · Follow-up ${fmtDate(p.followupDate)}</div>
+            ${p.service ? `<div class="card-meta" style="margin-top:2px;"><span class="badge upcoming" style="background:var(--surface-2);">${escapeHtml(p.service)}</span></div>` : ''}
+          </div>
+          ${badge}
+        </div>
+        ${p.notes && !isExpanded ? `<div class="card-notes">${escapeHtml(p.notes)}</div>` : ''}
+        ${actions}
+        ${expandedHtml}
+        <div class="card-actions" style="margin-top:6px;">
+          <button class="btn-ghost btn-sm" data-action="edit-prospect" data-id="${p.id}">Edit</button>
+          <button class="btn-ghost btn-sm" data-action="delete-prospect" data-id="${p.id}">Delete</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function followupMessage(p, gym) {
+    return `Hi ${p.name}, this is a quick follow-up from ${gym ? gym.name : 'us'} about your gym enquiry. Let us know if you have any questions or would like to visit!`;
+  }
+  function packageMessage(p, pkg, gym) {
+    const priceLine = pkg.offerPrice
+      ? `~₹${pkg.price}~ ₹${pkg.offerPrice}${pkg.duration ? ' — ' + pkg.duration : ''} — Special offer!`
+      : `₹${pkg.price}${pkg.duration ? ' — ' + pkg.duration : ''}`;
+    let lines = [
+      `Hi ${p.name}, here's the ${pkg.name} plan at ${gym ? gym.name : ''}:`,
+      priceLine,
+    ];
+    const sv = packageSavings(pkg);
+    if (sv) lines.push(`You save ₹${sv.savings.toLocaleString('en-IN')} (${sv.pct}%) compared to paying monthly!`);
+    const timingsLine = packageTimingsLabel(pkg, gym);
+    if (timingsLine) lines.push(`Timings: ${timingsLine}`);
+    if (pkg.notes) lines.push(pkg.notes);
+    lines.push('', 'Let me know if you would like to join!');
+    return lines.join('\n');
+  }
+
+  function bindProspectEvents() {
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => { searchTerm = e.target.value; renderProspectsView(); });
+      searchInput.focus();
+      searchInput.selectionStart = searchInput.selectionEnd = searchInput.value.length;
+    }
+    document.querySelectorAll('.status-toggle button').forEach(btn => {
+      btn.addEventListener('click', () => { statusFilter = btn.dataset.status; expandedProspectId = null; renderProspectsView(); });
+    });
+    document.querySelectorAll('[data-action]').forEach(el => {
+      el.addEventListener('click', handleAction);
+    });
+  }
+
+  function handleAction(e) {
+    const action = e.currentTarget.dataset.action;
+    const id = e.currentTarget.dataset.id;
+    if (action === 'add-prospect') openProspectModal(null);
+    if (action === 'edit-prospect') openProspectModal(id);
+    if (action === 'delete-prospect') deleteProspect(id);
+    if (action === 'log-followup') { expandedProspectId = expandedProspectId === id ? null : id; renderProspectsView(); }
+    if (action === 'reschedule') doReschedule(id);
+    if (action === 'mark-joined') setStatus(id, 'joined');
+    if (action === 'mark-lost') setStatus(id, 'lost');
+    if (action === 'send-package') openSendPackageModal(id);
+    if (action === 'add-gym') openGymModal();
+    if (action === 'manage-gyms') openManageGymsModal();
+    if (action === 'rename-gym') renameGym(id);
+    if (action === 'create-image') openPackageImageModal(id);
+    if (action === 'download-package-image') downloadPackageImage(id);
+    if (action === 'create-comparison-image') openComparisonImageModal();
+    if (action === 'download-comparison-image') downloadComparisonImage();
+    if (action === 'add-package') openPackageModal(null);
+    if (action === 'edit-package') openPackageModal(id);
+    if (action === 'delete-package') deletePackage(id);
+  }
+
+  async function doReschedule(id) {
+    const note = document.getElementById('log-note-' + id).value;
+    const date = document.getElementById('log-date-' + id).value;
+    if (!date) { toast('Pick a next follow-up date'); return; }
+    try {
+      await db.collection('prospects').doc(id).update({ notes: note, followupDate: date, updatedAt: Date.now() });
+      expandedProspectId = null;
+      toast('Follow-up scheduled');
+    } catch (err) { toast('Could not save: ' + err.code); }
+  }
+
+  async function setStatus(id, status) {
+    try {
+      await db.collection('prospects').doc(id).update({ status, updatedAt: Date.now() });
+      expandedProspectId = null;
+      toast(status === 'joined' ? 'Marked as joined' : 'Marked as lost');
+    } catch (err) { toast('Could not save: ' + err.code); }
+  }
+
+  async function deleteProspect(id) {
+    if (!confirm('Delete this prospect?')) return;
+    try {
+      await db.collection('prospects').doc(id).delete();
+      toast('Deleted');
+    } catch (err) { toast('Could not delete: ' + err.code); }
+  }
+
+  // ---------- Packages view ----------
+  function effectivePrice(pkg) {
+    return Number(pkg.offerPrice || pkg.price);
+  }
+  function packageSavings(pkg) {
+    if ((pkg.durationUnit || 'month') !== 'month' || !pkg.durationMonths || pkg.durationMonths <= 1) return null;
+    const baseline = packages.find(x => (x.durationUnit || 'month') === 'month' && Number(x.durationMonths) === 1);
+    if (!baseline) return null;
+    const baselinePrice = effectivePrice(baseline);
+    if (!baselinePrice) return null;
+    const fullPrice = baselinePrice * pkg.durationMonths;
+    const savings = fullPrice - effectivePrice(pkg);
+    if (savings <= 0) return null;
+    const pct = Math.round((savings / fullPrice) * 100);
+    return { savings, pct, fullPrice };
+  }
+
+  function renderPackagesView() {
+    const main = document.getElementById('main');
+    const gym = currentGym();
+    if (!gym) { main.innerHTML = ''; return; }
+    let html = '';
+    if (packages.length === 0) {
+      html = emptyState('No packages yet', `Add pricing plans for ${gym.name} to send over WhatsApp.`, 'Add package', 'add-package');
+    } else {
+      const sorted = [...packages].sort((a, b) => durationDaysApprox(a) - durationDaysApprox(b));
+      html = (sorted.length > 1 ? `<div style="padding:0 16px 12px;"><button class="btn btn-pkg" data-action="create-comparison-image">Compare all plans (image)</button></div>` : '') +
+        `<div class="card-list">` + sorted.map(pkg => {
+        const sv = packageSavings(pkg);
+        return `
+        <div class="pkg-card">
+          <div class="pkg-top">
+            <div class="pkg-name">${escapeHtml(pkg.name)}</div>
+            <div class="pkg-price">${pkg.offerPrice ? `<span style="text-decoration:line-through; color:var(--ink-faint); font-weight:400; font-size:14px; margin-right:5px;">₹${escapeHtml(pkg.price)}</span>` : ''}₹${escapeHtml(pkg.offerPrice || pkg.price)}</div>
+          </div>
+          <div class="pkg-meta">${escapeHtml(pkg.duration || monthsLabel(pkg.durationMonths || 1))}${pkg.service ? ' · ' + escapeHtml(pkg.service) : ''}${packageTimingsLabel(pkg, gym) ? ' · ' + escapeHtml(packageTimingsLabel(pkg, gym)) : ''}</div>
+          ${pkg.offerPrice ? `<div style="margin-top:6px;"><span class="badge today">Special offer</span></div>` : ''}
+          ${sv ? `<div style="margin-top:6px;"><span class="badge joined">Save ₹${sv.savings.toLocaleString('en-IN')} (${sv.pct}%) vs monthly</span></div>` : ''}
+          ${pkg.notes ? `<div class="pkg-notes">${escapeHtml(pkg.notes)}</div>` : ''}
+          <div class="pkg-actions">
+            <button class="btn btn-sm btn-pkg" data-action="create-image" data-id="${pkg.id}">Create image</button>
+            <button class="btn-ghost btn-sm" data-action="edit-package" data-id="${pkg.id}">Edit</button>
+            <button class="btn-ghost btn-sm" data-action="delete-package" data-id="${pkg.id}">Delete</button>
+          </div>
+        </div>
+      `;
+      }).join('') + `</div>`;
+    }
+    main.innerHTML = html;
+    document.querySelectorAll('[data-action]').forEach(el => el.addEventListener('click', handleAction));
+  }
+
+  async function deletePackage(id) {
+    if (!confirm('Delete this package?')) return;
+    try {
+      await db.collection('packages').doc(id).delete();
+      toast('Deleted');
+    } catch (err) { toast('Could not delete: ' + err.code); }
+  }
+
+  // ---------- Package poster image ----------
+  function wrapText(ctx, text, x, y, maxWidth, lineHeight, draw) {
+    const words = String(text).split(' ');
+    let line = '';
+    let curY = y;
+    for (let i = 0; i < words.length; i++) {
+      const test = line + words[i] + ' ';
+      if (ctx.measureText(test).width > maxWidth && line) {
+        if (draw !== false) ctx.fillText(line.trim(), x, curY);
+        line = words[i] + ' ';
+        curY += lineHeight;
+      } else {
+        line = test;
+      }
+    }
+    if (draw !== false) ctx.fillText(line.trim(), x, curY);
+    return curY;
+  }
+
+  function renderPackageContent(ctx, pkg, gym, draw) {
+    const accent = '#D93A2B';
+    const ink = '#12181F';
+
+    if (draw) {
+      ctx.fillStyle = accent;
+      ctx.fillRect(0, 0, 1080, 18);
+    }
+
+    // gym name
+    ctx.fillStyle = ink;
+    ctx.font = '600 40px Oswald, sans-serif';
+    ctx.textAlign = 'left';
+    if (draw) ctx.fillText((gym ? gym.name : '').toUpperCase(), 70, 140);
+    if (draw) { ctx.fillStyle = accent; ctx.fillRect(70, 165, 90, 6); }
+
+    // package name
+    ctx.fillStyle = ink;
+    ctx.font = '700 64px Oswald, sans-serif';
+    wrapText(ctx, pkg.name, 70, 280, 940, 68, draw);
+
+    // duration label
+    ctx.font = '500 34px Inter, sans-serif';
+    ctx.fillStyle = '#5B6672';
+    const durLine = (pkg.duration || monthsLabel(pkg.durationMonths || 1)) + (pkg.service ? ' · ' + pkg.service : '');
+    if (draw) ctx.fillText(durLine, 70, 355);
+
+    // offer ribbon + struck-through original price
+    if (pkg.offerPrice) {
+      if (draw) {
+        ctx.fillStyle = '#B9791A';
+        roundedRect(ctx, 70, 385, 260, 46, 8);
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.font = '700 24px Inter, sans-serif';
+        ctx.fillText('SPECIAL OFFER', 92, 415);
+      }
+      const strikeText = '₹' + Number(pkg.price).toLocaleString('en-IN');
+      ctx.font = '500 46px Inter, sans-serif';
+      if (draw) {
+        ctx.fillStyle = '#8B94A0';
+        ctx.fillText(strikeText, 70, 500);
+        const strikeW = ctx.measureText(strikeText).width;
+        ctx.beginPath();
+        ctx.moveTo(70, 500 - 16);
+        ctx.lineTo(70 + strikeW, 500 - 16);
+        ctx.strokeStyle = '#8B94A0';
+        ctx.lineWidth = 4;
+        ctx.stroke();
+      }
+    }
+
+    // price block
+    const eff = effectivePrice(pkg);
+    const priceBaselineY = pkg.offerPrice ? 700 : 560;
+    ctx.font = '700 150px Oswald, sans-serif';
+    ctx.fillStyle = accent;
+    if (draw) ctx.fillText('₹' + eff.toLocaleString('en-IN'), 70, priceBaselineY);
+
+    // savings badge
+    const sv = packageSavings(pkg);
+    let nextY = pkg.offerPrice ? 780 : 640;
+    if (sv) {
+      const label = `You save ₹${sv.savings.toLocaleString('en-IN')} (${sv.pct}%) vs monthly`;
+      ctx.font = '600 32px Inter, sans-serif';
+      if (draw) {
+        ctx.fillStyle = '#1E7A46';
+        const w = ctx.measureText(label).width + 48;
+        ctx.beginPath();
+        ctx.roundRect ? ctx.roundRect(70, nextY, w, 60, 30) : ctx.rect(70, nextY, w, 60);
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.fillText(label, 94, nextY + 41);
+      }
+      nextY += 100;
+    }
+
+    // timings
+    const displayTimings = packageTimingsLabel(pkg, gym);
+    if (displayTimings) {
+      ctx.font = '600 32px Inter, sans-serif';
+      if (draw) { ctx.fillStyle = ink; ctx.fillText('Timings', 70, nextY + 20); }
+      ctx.font = '400 30px Inter, sans-serif';
+      ctx.fillStyle = '#5B6672';
+      nextY = wrapText(ctx, displayTimings, 70, nextY + 62, 940, 40, draw);
+      nextY += 30;
+    }
+
+    // notes
+    if (pkg.notes) {
+      ctx.font = '600 32px Inter, sans-serif';
+      if (draw) { ctx.fillStyle = ink; ctx.fillText('Includes', 70, nextY + 20); }
+      ctx.font = '400 30px Inter, sans-serif';
+      ctx.fillStyle = '#5B6672';
+      nextY = wrapText(ctx, pkg.notes, 70, nextY + 62, 940, 40, draw);
+    }
+
+    return nextY;
+  }
+
+  function drawPackageCanvas(pkg, gym) {
+    const measureCanvas = document.createElement('canvas');
+    measureCanvas.width = 1080;
+    measureCanvas.height = 10;
+    const mctx = measureCanvas.getContext('2d');
+    const contentEndY = renderPackageContent(mctx, pkg, gym, false);
+    const height = Math.max(1000, contentEndY + 130);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 1080;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+
+    ctx.fillStyle = '#F4F1EA';
+    ctx.fillRect(0, 0, 1080, height);
+    renderPackageContent(ctx, pkg, gym, true);
+
+    // footer
+    ctx.fillStyle = '#D93A2B';
+    ctx.fillRect(0, height - 50, 1080, 50);
+    ctx.fillStyle = '#fff';
+    ctx.font = '600 30px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Contact us to join today', 540, height - 16);
+
+    return canvas;
+  }
+
+  function openPackageImageModal(id) {
+    const pkg = packages.find(x => x.id === id);
+    const gym = currentGym();
+    if (!pkg) return;
+    const canvas = drawPackageCanvas(pkg, gym);
+    const dataUrl = canvas.toDataURL('image/png');
+    const html = `
+      <h2>Package image</h2>
+      <img src="${dataUrl}" style="width:100%; border-radius:6px; border:1px solid var(--border); margin-bottom:14px;">
+      <p style="font-size:13px; color:var(--ink-muted); margin-bottom:14px;">Download it, then attach it in WhatsApp like any photo — a message link can't attach an image directly.</p>
+      <div class="modal-actions">
+        <button class="btn btn-primary" data-action="download-package-image" data-id="${pkg.id}">Download image</button>
+      </div>
+    `;
+    openModal(html);
+  }
+
+  async function downloadPackageImage(id) {
+    const pkg = packages.find(x => x.id === id);
+    const gym = currentGym();
+    if (!pkg) return;
+    const canvas = drawPackageCanvas(pkg, gym);
+    canvas.toBlob((blob) => {
+      if (!blob) { toast('Could not create image'); return; }
+      try {
+        const filename = (pkg.name || 'package').replace(/[^a-z0-9]+/gi, '-').toLowerCase() + '.png';
+        browserDownload(blob, filename);
+        toast('Image downloaded');
+        closeModal();
+      } catch (err) {
+        toast('Could not download the image');
+      }
+    }, 'image/png');
+  }
+
+  function strikeRight(ctx, text, rightX, y, font, color) {
+    ctx.font = font;
+    ctx.fillStyle = color;
+    ctx.textAlign = 'right';
+    ctx.fillText(text, rightX, y);
+    const w = ctx.measureText(text).width;
+    ctx.beginPath();
+    ctx.moveTo(rightX - w, y - 10);
+    ctx.lineTo(rightX, y - 10);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  }
+
+  function drawComparisonCanvas(gym, list) {
+    const sorted = [...list].sort((a, b) => durationDaysApprox(a) - durationDaysApprox(b));
+    const baseline = sorted.find(p => (p.durationUnit || 'month') === 'month' && Number(p.durationMonths) === 1);
+    const rowH = 190;
+    const gap = 22;
+    const headerH = 356;
+    const footerH = 70;
+    const width = 1080;
+    const height = headerH + sorted.length * (rowH + gap) + footerH;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    const accent = '#D93A2B';
+    const ink = '#12181F';
+    const muted = '#5B6672';
+
+    ctx.fillStyle = '#F4F1EA';
+    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = accent;
+    ctx.fillRect(0, 0, width, 18);
+
+    ctx.textAlign = 'left';
+    ctx.fillStyle = ink;
+    ctx.font = '600 38px Oswald, sans-serif';
+    ctx.fillText((gym ? gym.name : '').toUpperCase(), 70, 130);
+    ctx.fillStyle = accent;
+    ctx.fillRect(70, 152, 90, 6);
+
+    ctx.fillStyle = ink;
+    ctx.font = '700 58px Oswald, sans-serif';
+    ctx.fillText('Membership Plans', 70, 230);
+    ctx.font = '400 26px Inter, sans-serif';
+    ctx.fillStyle = muted;
+    ctx.fillText('Longer plans, bigger savings', 70, 270);
+    const gymTimings = gymTimingsLabel(gym);
+    if (gymTimings) {
+      ctx.font = '500 26px Inter, sans-serif';
+      ctx.fillStyle = ink;
+      ctx.fillText('Timings: ' + gymTimings, 70, 308);
+    }
+
+    // find best-value plan (highest savings pct among non-baseline)
+    let bestId = null, bestPct = 0;
+    sorted.forEach(p => {
+      const sv = packageSavingsFor(p, baseline);
+      if (sv && sv.pct > bestPct) { bestPct = sv.pct; bestId = p.id; }
+    });
+
+    let y = headerH;
+    sorted.forEach(pkg => {
+      const isBest = pkg.id === bestId;
+      const sv = packageSavingsFor(pkg, baseline);
+
+      // row card
+      ctx.fillStyle = '#FFFFFF';
+      ctx.strokeStyle = isBest ? accent : '#D7DCE1';
+      ctx.lineWidth = isBest ? 4 : 2;
+      roundedRect(ctx, 70, y, width - 140, rowH, 14);
+      ctx.fill();
+      ctx.stroke();
+
+      if (isBest) {
+        ctx.fillStyle = accent;
+        roundedRect(ctx, 70, y - 18, 170, 40, 8);
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.font = '600 22px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('BEST VALUE', 155, y + 9);
+      }
+      if (pkg.offerPrice) {
+        ctx.fillStyle = '#B9791A';
+        roundedRect(ctx, width - 210, y - 18, 140, 40, 8);
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.font = '700 20px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('OFFER', width - 140, y + 9);
+      }
+
+      // left: plan name + duration
+      ctx.textAlign = 'left';
+      ctx.fillStyle = ink;
+      ctx.font = '700 36px Oswald, sans-serif';
+      ctx.fillText(pkg.name, 100, y + 62);
+      ctx.font = '400 24px Inter, sans-serif';
+      ctx.fillStyle = muted;
+      const durLabel = pkg.duration || monthsLabel(pkg.durationMonths || 1);
+      const rowTimings = packageTimingsLabel(pkg, gym);
+      const showRowTimings = rowTimings && rowTimings !== gymTimingsLabel(gym);
+      let subLine = durLabel + (pkg.service ? ' · ' + pkg.service : '');
+      ctx.fillText(subLine, 100, y + 96);
+      if (showRowTimings) {
+        ctx.font = '400 22px Inter, sans-serif';
+        ctx.fillText(rowTimings, 100, y + 124);
+      }
+      if (sv) {
+        ctx.fillStyle = '#1E7A46';
+        ctx.font = '600 24px Inter, sans-serif';
+        ctx.fillText(`Save ${sv.pct}%`, 100, showRowTimings ? y + 155 : y + 130);
+      }
+
+      // right: pricing
+      const rightX = width - 100;
+      const eff = effectivePrice(pkg);
+      const originalForStrike = pkg.offerPrice ? pkg.price : (sv ? sv.fullPrice : null);
+      let priceY = (sv || pkg.offerPrice) ? y + 62 : y + 78;
+      if (originalForStrike) strikeRight(ctx, '₹' + Number(originalForStrike).toLocaleString('en-IN'), rightX, y + 44, '400 26px Inter, sans-serif', muted);
+      ctx.textAlign = 'right';
+      ctx.fillStyle = accent;
+      ctx.font = '700 50px Oswald, sans-serif';
+      ctx.fillText('₹' + eff.toLocaleString('en-IN'), rightX, priceY + 40);
+      ctx.font = '400 24px Inter, sans-serif';
+      ctx.fillStyle = muted;
+      if ((pkg.durationUnit || 'month') === 'month' && pkg.durationMonths > 1) {
+        const perMonth = Math.round(eff / pkg.durationMonths);
+        ctx.fillText('₹' + perMonth.toLocaleString('en-IN') + ' / month', rightX, priceY + 76);
+      }
+
+      y += rowH + gap;
+    });
+
+    ctx.fillStyle = accent;
+    ctx.fillRect(0, height - footerH, width, footerH);
+    ctx.fillStyle = '#fff';
+    ctx.font = '600 30px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Contact us to join today', width / 2, height - footerH + 44);
+
+    return canvas;
+  }
+
+  function roundedRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function packageSavingsFor(pkg, baseline) {
+    if ((pkg.durationUnit || 'month') !== 'month' || !pkg.durationMonths || pkg.durationMonths <= 1 || !baseline) return null;
+    const baselinePrice = effectivePrice(baseline);
+    if (!baselinePrice) return null;
+    const fullPrice = baselinePrice * pkg.durationMonths;
+    const savings = fullPrice - effectivePrice(pkg);
+    if (savings <= 0) return null;
+    const pct = Math.round((savings / fullPrice) * 100);
+    return { savings, pct, fullPrice };
+  }
+
+  function openComparisonImageModal() {
+    const gym = currentGym();
+    if (packages.length < 2) { toast('Add at least 2 packages first'); return; }
+    const canvas = drawComparisonCanvas(gym, packages);
+    const dataUrl = canvas.toDataURL('image/png');
+    const html = `
+      <h2>All plans, compared</h2>
+      <img src="${dataUrl}" style="width:100%; border-radius:6px; border:1px solid var(--border); margin-bottom:14px;">
+      <p style="font-size:13px; color:var(--ink-muted); margin-bottom:14px;">Download it, then attach it in WhatsApp like any photo.</p>
+      <div class="modal-actions">
+        <button class="btn btn-primary" data-action="download-comparison-image">Download image</button>
+      </div>
+    `;
+    openModal(html);
+  }
+
+  async function downloadComparisonImage() {
+    const gym = currentGym();
+    const canvas = drawComparisonCanvas(gym, packages);
+    canvas.toBlob((blob) => {
+      if (!blob) { toast('Could not create image'); return; }
+      try {
+        const filename = ((gym ? gym.name : 'gym') + '-plans').replace(/[^a-z0-9]+/gi, '-').toLowerCase() + '.png';
+        browserDownload(blob, filename);
+        toast('Image downloaded');
+        closeModal();
+      } catch (err) {
+        toast('Could not download the image');
+      }
+    }, 'image/png');
+  }
+
+  // ---------- Modals ----------
+  function openModal(html) {
+    document.getElementById('modal-content').innerHTML = `<button class="modal-close" data-action="close-modal">&times;</button>` + html;
+    document.getElementById('modal-overlay').classList.remove('hidden');
+    document.getElementById('modal-content').querySelectorAll('[data-action="close-modal"]').forEach(b => b.addEventListener('click', closeModal));
+  }
+  function closeModal() {
+    document.getElementById('modal-overlay').classList.add('hidden');
+    document.getElementById('modal-content').innerHTML = '';
+  }
+  document.getElementById('modal-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'modal-overlay') closeModal();
+  });
+
+  function openProspectModal(id) {
+    editingProspectId = id;
+    const p = id ? prospects.find(x => x.id === id) : null;
+    const gymServices = serviceNames(currentGym());
+    const html = `
+      <h2>${p ? 'Edit prospect' : 'New prospect'}</h2>
+      <div class="field"><label>Name</label><input id="f-name" type="text" value="${p ? escapeHtml(p.name) : ''}" placeholder="Full name"></div>
+      <div class="field-row">
+        <div class="field"><label>Phone</label><input id="f-phone" type="tel" value="${p ? escapeHtml(p.phone) : ''}" placeholder="10-digit number"></div>
+        <div class="field"><label>Age</label><input id="f-age" type="number" min="1" value="${p && p.age ? p.age : ''}" placeholder="Optional"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Enquiry date</label><input id="f-enquiry" type="date" value="${p ? p.enquiryDate || '' : todayStr()}"></div>
+        <div class="field"><label>Follow-up date</label><input id="f-followup" type="date" value="${p ? p.followupDate || '' : todayStr()}"></div>
+      </div>
+      <div class="field"><label>How did they find us?</label>
+        <select id="f-source">
+          <option value="">Not noted</option>
+          ${SOURCES.map(s => `<option value="${s}" ${p && p.source === s ? 'selected' : ''}>${s}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field"><label>Service enquired</label>
+        ${gymServices.length ? `
+        <select id="f-service">
+          <option value="">Not noted</option>
+          ${gymServices.map(s => `<option value="${escapeHtml(s)}" ${p && p.service === s ? 'selected' : ''}>${escapeHtml(s)}</option>`).join('')}
+        </select>
+        ` : `<input id="f-service" type="text" value="${p ? escapeHtml(p.service || '') : ''}" placeholder="e.g. Kickboxing">
+        <p style="font-size:12px; color:var(--ink-faint); margin-top:4px;">Tip: add this gym's services under Manage gyms to pick from a list.</p>`}
+      </div>
+      <div class="field"><label>Notes</label><textarea id="f-notes" placeholder="What did they ask about, budget, plan interest…">${p ? escapeHtml(p.notes || '') : ''}</textarea></div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" data-action="save-prospect">Save</button>
+      </div>
+    `;
+    openModal(html);
+    document.querySelector('[data-action="save-prospect"]').addEventListener('click', saveProspect);
+  }
+
+  async function saveProspect() {
+    const name = document.getElementById('f-name').value.trim();
+    const phone = document.getElementById('f-phone').value.trim();
+    const age = document.getElementById('f-age').value.trim();
+    const enquiryDate = document.getElementById('f-enquiry').value;
+    const followupDate = document.getElementById('f-followup').value;
+    const source = document.getElementById('f-source').value;
+    const service = document.getElementById('f-service').value.trim();
+    const notes = document.getElementById('f-notes').value.trim();
+    if (!name || !phone) { toast('Name and phone are required'); return; }
+    const data = {
+      gymId: currentGymId, name, phone,
+      age: age ? Number(age) : null,
+      enquiryDate: enquiryDate || todayStr(),
+      followupDate: followupDate || null,
+      source: source || null,
+      service: service || null,
+      notes,
+      updatedAt: Date.now(),
+    };
+    try {
+      if (editingProspectId) {
+        await db.collection('prospects').doc(editingProspectId).update(data);
+      } else {
+        data.status = 'active';
+        data.createdAt = Date.now();
+        await db.collection('prospects').add(data);
+      }
+      closeModal();
+      toast('Saved');
+    } catch (err) { toast('Could not save: ' + err.code); }
+  }
+
+  function openSendPackageModal(prospectId) {
+    const p = prospects.find(x => x.id === prospectId);
+    const gym = currentGym();
+    if (!p) return;
+    if (packages.length === 0) {
+      openModal(`<h2>No packages yet</h2><p style="color:var(--ink-muted);font-size:14px;margin-bottom:12px;">Add a package for ${escapeHtml(gym.name)} first.</p>
+        <div class="modal-actions"><button class="btn btn-primary" data-action="close-modal-then-add-pkg">Add package</button></div>`);
+      document.querySelector('[data-action="close-modal-then-add-pkg"]').addEventListener('click', () => { closeModal(); currentView = 'packages'; render(); openPackageModal(null); });
+      return;
+    }
+    const html = `
+      <h2>Send package to ${escapeHtml(p.name)}</h2>
+      <div class="field"><label>Choose package</label>
+        <select id="f-pkg-select">
+          ${packages.map(pkg => `<option value="${pkg.id}">${escapeHtml(pkg.name)} — ₹${escapeHtml(pkg.offerPrice || pkg.price)}${pkg.offerPrice ? ' (offer)' : ''}</option>`).join('')}
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-whatsapp" data-action="confirm-send-package" data-id="${p.id}">Open in WhatsApp</button>
+      </div>
+    `;
+    openModal(html);
+    document.querySelector('[data-action="confirm-send-package"]').addEventListener('click', () => {
+      const pkgId = document.getElementById('f-pkg-select').value;
+      const pkg = packages.find(x => x.id === pkgId);
+      const msg = packageMessage(p, pkg, gym);
+      window.open(`https://wa.me/${normalizePhone(p.phone)}?text=${encodeURIComponent(msg)}`, '_blank');
+      closeModal();
+    });
+  }
+
+  function openPackageModal(id) {
+    editingPackageId = id;
+    const pkg = id ? packages.find(x => x.id === id) : null;
+    const gym = currentGym();
+    const svcNames = serviceNames(gym);
+    const html = `
+      <h2>${pkg ? 'Edit package' : 'New package'}</h2>
+      <div class="field"><label>Package name</label><input id="f-pname" type="text" value="${pkg ? escapeHtml(pkg.name) : ''}" placeholder="e.g. Monthly Gym Access"></div>
+      <div class="field-row">
+        <div class="field"><label>Regular price (₹)</label><input id="f-pprice" type="number" min="0" value="${pkg ? pkg.price : ''}" placeholder="1500"></div>
+        <div class="field"><label>Offer price (₹, optional)</label><input id="f-poffer" type="number" min="0" value="${pkg && pkg.offerPrice ? pkg.offerPrice : ''}" placeholder="Leave blank if no offer"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Duration</label>
+          <input type="number" id="f-pdvalue" min="1" value="${pkg ? (pkg.durationValue || pkg.durationMonths || 1) : 1}">
+        </div>
+        <div class="field"><label>Unit</label>
+          <select id="f-pdunit">
+            <option value="day" ${pkg && pkg.durationUnit === 'day' ? 'selected' : ''}>Day(s)</option>
+            <option value="week" ${pkg && pkg.durationUnit === 'week' ? 'selected' : ''}>Week(s)</option>
+            <option value="month" ${!pkg || !pkg.durationUnit || pkg.durationUnit === 'month' ? 'selected' : ''}>Month(s)</option>
+          </select>
+        </div>
+      </div>
+      <p style="font-size:12px; color:var(--ink-faint); margin:-8px 0 12px 0;">e.g. 1 Week for a trial pass, 3 Days for a guest pass, or 6 Months for a membership.</p>
+      <div class="field"><label>Applies to service</label>
+        <select id="f-pservice">
+          <option value="">General / not service-specific</option>
+          ${svcNames.map(s => `<option value="${escapeHtml(s)}" ${pkg && pkg.service === s ? 'selected' : ''}>${escapeHtml(s)}</option>`).join('')}
+        </select>
+        <p id="f-pservice-hint" style="font-size:12px; color:var(--ink-faint); margin-top:4px;"></p>
+      </div>
+      <div class="field"><label>Custom timings (optional override)</label><input id="f-ptimings" type="text" value="${pkg ? escapeHtml(pkg.timings || '') : ''}" placeholder="Leave blank to use the service or gym's timings"></div>
+      <div class="field"><label>Notes</label><textarea id="f-pnotes" placeholder="What's included…">${pkg ? escapeHtml(pkg.notes || '') : ''}</textarea></div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" data-action="save-package">Save</button>
+      </div>
+    `;
+    openModal(html);
+    document.querySelector('[data-action="save-package"]').addEventListener('click', savePackage);
+    const updateServiceHint = () => {
+      const svcName = document.getElementById('f-pservice').value;
+      const label = svcName ? packageTimingsLabel({ service: svcName, timings: '' }, gym) : gymTimingsLabel(gym);
+      document.getElementById('f-pservice-hint').textContent = label ? 'Timings: ' + label : 'No timings set for this yet — add them under Manage gyms.';
+    };
+    document.getElementById('f-pservice').addEventListener('change', updateServiceHint);
+    updateServiceHint();
+  }
+
+  function monthsLabel(n) { return n === 1 ? '1 Month' : `${n} Months`; }
+  function durationUnitLabel(unit, value) {
+    const n = Number(value) || 1;
+    const names = { day: 'Day', week: 'Week', month: 'Month' };
+    const name = names[unit] || 'Month';
+    return n === 1 ? `1 ${name}` : `${n} ${name}s`;
+  }
+  function durationDaysApprox(pkg) {
+    const unit = pkg.durationUnit || 'month';
+    const val = Number(pkg.durationValue || pkg.durationMonths || 1);
+    if (unit === 'day') return val;
+    if (unit === 'week') return val * 7;
+    return val * 30;
+  }
+
+  async function savePackage() {
+    const name = document.getElementById('f-pname').value.trim();
+    const price = document.getElementById('f-pprice').value.trim();
+    const offerPriceRaw = document.getElementById('f-poffer').value.trim();
+    const durationValue = Number(document.getElementById('f-pdvalue').value);
+    const durationUnit = document.getElementById('f-pdunit').value;
+    const timings = document.getElementById('f-ptimings').value.trim();
+    const service = document.getElementById('f-pservice').value;
+    const notes = document.getElementById('f-pnotes').value.trim();
+    if (!name || !price) { toast('Name and price are required'); return; }
+    if (!durationValue || durationValue < 1) { toast('Enter a valid duration'); return; }
+    if (offerPriceRaw && Number(offerPriceRaw) >= Number(price)) { toast('Offer price should be less than the regular price'); return; }
+    const data = {
+      gymId: currentGymId, name, price: Number(price),
+      offerPrice: offerPriceRaw ? Number(offerPriceRaw) : null,
+      durationUnit, durationValue,
+      durationMonths: durationUnit === 'month' ? durationValue : null,
+      duration: durationUnitLabel(durationUnit, durationValue),
+      service: service || null,
+      timings, notes, updatedAt: Date.now(),
+    };
+    try {
+      if (editingPackageId) {
+        await db.collection('packages').doc(editingPackageId).update(data);
+      } else {
+        data.createdAt = Date.now();
+        await db.collection('packages').add(data);
+      }
+      closeModal();
+      toast('Saved');
+    } catch (err) { toast('Could not save: ' + err.code); }
+  }
+
+  function batchTimeFields(prefix, g) {
+    return `
+      <div class="field-row">
+        <div class="field"><label>Morning batch — from</label><input id="${prefix}-morning-start" type="time" value="${g && g.morningStart ? g.morningStart : ''}"></div>
+        <div class="field"><label>Morning batch — to</label><input id="${prefix}-morning-end" type="time" value="${g && g.morningEnd ? g.morningEnd : ''}"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Evening batch — from</label><input id="${prefix}-evening-start" type="time" value="${g && g.eveningStart ? g.eveningStart : ''}"></div>
+        <div class="field"><label>Evening batch — to</label><input id="${prefix}-evening-end" type="time" value="${g && g.eveningEnd ? g.eveningEnd : ''}"></div>
+      </div>
+      <p style="font-size:12px; color:var(--ink-faint); margin:-4px 0 12px 0;">Leave a batch blank if the gym doesn't run one.</p>
+    `;
+  }
+  function readBatchTimeFields(prefix) {
+    return {
+      morningStart: document.getElementById(`${prefix}-morning-start`).value || null,
+      morningEnd: document.getElementById(`${prefix}-morning-end`).value || null,
+      eveningStart: document.getElementById(`${prefix}-evening-start`).value || null,
+      eveningEnd: document.getElementById(`${prefix}-evening-end`).value || null,
+    };
+  }
+
+  function openGymModal() {
+    const html = `
+      <h2>Add a gym</h2>
+      <div class="field"><label>Gym name</label><input id="f-gymname" type="text" placeholder="e.g. Elite Fightclub"></div>
+      <p style="font-size:12px; color:var(--ink-faint); margin-bottom:6px;">General timings (used until you set per-service hours)</p>
+      ${batchTimeFields('f-gym', null)}
+      <p style="font-size:12px; color:var(--ink-faint); margin:-8px 0 12px 0;">You can add services and their own timings afterwards from Manage gyms.</p>
+      <div class="modal-actions"><button class="btn btn-primary" data-action="save-gym">Save</button></div>
+    `;
+    openModal(html);
+    document.querySelector('[data-action="save-gym"]').addEventListener('click', saveGym);
+  }
+
+  async function saveGym() {
+    const name = document.getElementById('f-gymname').value.trim();
+    const batch = readBatchTimeFields('f-gym');
+    if (!name) { toast('Enter a gym name'); return; }
+    try {
+      const ref = await db.collection('gyms').add({ name, ...batch, services: [], createdAt: Date.now() });
+      closeModal();
+      switchGym(ref.id);
+      toast('Gym added — add services under Manage gyms');
+    } catch (err) { toast('Could not save: ' + err.code); }
+  }
+
+  function openManageGymsModal() {
+    const html = `
+      <h2>Manage gyms</h2>
+      ${gyms.map(g => `
+        <div style="border-bottom:1px solid var(--border); padding-bottom:14px; margin-bottom:14px;">
+          <div class="field"><label>${g.id === currentGymId ? 'Current gym name' : 'Gym name'}</label>
+            <input type="text" id="rename-${g.id}" value="${escapeHtml(g.name)}">
+          </div>
+          <p style="font-size:12px; color:var(--ink-faint); margin-bottom:6px;">General timings (used when a package isn't tied to a specific service)</p>
+          ${batchTimeFields('gym-' + g.id, g)}
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button class="btn btn-sm btn-primary" data-action="rename-gym" data-id="${g.id}">Save changes</button>
+            <button class="btn btn-sm" data-action="manage-services" data-id="${g.id}">Services &amp; timings (${(g.services || []).length})</button>
+          </div>
+        </div>
+      `).join('')}
+    `;
+    openModal(html);
+    document.querySelectorAll('[data-action="rename-gym"]').forEach(btn => btn.addEventListener('click', () => renameGym(btn.dataset.id)));
+    document.querySelectorAll('[data-action="manage-services"]').forEach(btn => btn.addEventListener('click', () => openServicesModal(btn.dataset.id)));
+  }
+
+  async function renameGym(id) {
+    const name = document.getElementById('rename-' + id).value.trim();
+    const batch = readBatchTimeFields('gym-' + id);
+    if (!name) { toast('Enter a gym name'); return; }
+    try {
+      await db.collection('gyms').doc(id).update({ name, ...batch });
+      toast('Gym updated');
+      closeModal();
+    } catch (err) { toast('Could not save: ' + err.code); }
+  }
+
+  // ---------- Per-service timings ----------
+  let editingGymId = null;
+  let serviceRows = [];
+
+  function openServicesModal(gymId) {
+    editingGymId = gymId;
+    const gym = gyms.find(g => g.id === gymId);
+    serviceRows = ((gym && gym.services) || []).map(s => typeof s === 'object'
+      ? { rowId: uid(), name: s.name || '', morningStart: s.morningStart || null, morningEnd: s.morningEnd || null, eveningStart: s.eveningStart || null, eveningEnd: s.eveningEnd || null }
+      : { rowId: uid(), name: s, morningStart: null, morningEnd: null, eveningStart: null, eveningEnd: null });
+    renderServicesModal();
+  }
+
+  function syncServiceRowsFromDOM() {
+    serviceRows = serviceRows.map(r => {
+      const nameEl = document.getElementById('svc-name-' + r.rowId);
+      return {
+        rowId: r.rowId,
+        name: nameEl ? nameEl.value.trim() : r.name,
+        morningStart: document.getElementById('svc-' + r.rowId + '-morning-start') ? (document.getElementById('svc-' + r.rowId + '-morning-start').value || null) : r.morningStart,
+        morningEnd: document.getElementById('svc-' + r.rowId + '-morning-end') ? (document.getElementById('svc-' + r.rowId + '-morning-end').value || null) : r.morningEnd,
+        eveningStart: document.getElementById('svc-' + r.rowId + '-evening-start') ? (document.getElementById('svc-' + r.rowId + '-evening-start').value || null) : r.eveningStart,
+        eveningEnd: document.getElementById('svc-' + r.rowId + '-evening-end') ? (document.getElementById('svc-' + r.rowId + '-evening-end').value || null) : r.eveningEnd,
+      };
+    });
+  }
+
+  function renderServicesModal() {
+    const gym = gyms.find(g => g.id === editingGymId);
+    const html = `
+      <h2>Services &amp; timings</h2>
+      <p style="font-size:13px; color:var(--ink-muted); margin-bottom:14px;">${escapeHtml(gym ? gym.name : '')} — give a service its own hours, or leave them blank to use the gym's general timings.</p>
+      ${serviceRows.length === 0 ? `<p style="font-size:13px; color:var(--ink-faint); margin-bottom:12px;">No services yet.</p>` : ''}
+      ${serviceRows.map(r => `
+        <div style="border:1px solid var(--border); border-radius:6px; padding:12px; margin-bottom:12px;">
+          <div class="field"><label>Service name</label><input type="text" id="svc-name-${r.rowId}" value="${escapeHtml(r.name)}" placeholder="e.g. Kickboxing"></div>
+          ${batchTimeFields('svc-' + r.rowId, r)}
+          <button class="btn-ghost btn-sm" data-remove-row="${r.rowId}">Remove service</button>
+        </div>
+      `).join('')}
+      <button class="btn btn-sm" id="add-service-row-btn" style="margin-bottom:14px;">+ Add another service</button>
+      <div class="modal-actions"><button class="btn btn-primary" id="save-services-btn">Save services</button></div>
+    `;
+    openModal(html);
+    document.querySelectorAll('[data-remove-row]').forEach(btn => btn.addEventListener('click', () => {
+      syncServiceRowsFromDOM();
+      serviceRows = serviceRows.filter(r => r.rowId !== btn.dataset.removeRow);
+      renderServicesModal();
+    }));
+    const addBtn = document.getElementById('add-service-row-btn');
+    if (addBtn) addBtn.addEventListener('click', () => {
+      syncServiceRowsFromDOM();
+      serviceRows.push({ rowId: uid(), name: '', morningStart: null, morningEnd: null, eveningStart: null, eveningEnd: null });
+      renderServicesModal();
+    });
+    const saveBtn = document.getElementById('save-services-btn');
+    if (saveBtn) saveBtn.addEventListener('click', saveServices);
+  }
+
+  async function saveServices() {
+    syncServiceRowsFromDOM();
+    const cleaned = serviceRows.filter(r => r.name).map(({ rowId, ...rest }) => rest);
+    try {
+      await db.collection('gyms').doc(editingGymId).update({ services: cleaned });
+      toast('Services saved');
+      closeModal();
+    } catch (err) { toast('Could not save: ' + err.code); }
+  }
+
+  // ---------- Static bindings ----------
+  document.getElementById('gym-tabs').addEventListener('click', (e) => {
+    const btn = e.target.closest('.gym-tab');
+    if (btn) { statusFilter = 'active'; searchTerm=''; expandedProspectId=null; switchGym(btn.dataset.gymId); render(); }
+  });
+  document.getElementById('tab-prospects').addEventListener('click', () => { currentView = 'prospects'; render(); });
+  document.getElementById('tab-packages').addEventListener('click', () => { currentView = 'packages'; render(); });
+  document.getElementById('fab').addEventListener('click', () => {
+    if (currentView === 'prospects') openProspectModal(null);
+    else openPackageModal(null);
+  });
+  document.querySelector('[data-action="add-gym"]').addEventListener('click', openGymModal);
+  document.querySelector('[data-action="manage-gyms"]').addEventListener('click', openManageGymsModal);
+
+  init();
+})();
+</script>
+</body>
+</html>
